@@ -2,8 +2,8 @@
 import {storeToRefs} from "pinia";
 import {common_store} from "./store/common.ts";
 import themeOverrides from "./overwrite.ts";
-import {Ref, ref} from "vue";
-import {Line, Message} from "./types/message";
+import { ref} from "vue";
+import {Line} from "./types/message";
 import {dateZhCN, UploadCustomRequestOptions, zhCN} from "naive-ui";
 import LineEditor from "./components/LineEditor.vue";
 import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
@@ -41,7 +41,7 @@ const customRequest = ({
 const inputByStr = (str:string)=>{
   common.edit_message.value.length = 0;
   const lines = str.split('\n');
-  lines.forEach((line,index)=>{
+  lines.forEach((line)=>{
     common.edit_message.value.push({
       messages: JSON.parse(line).messages
     });

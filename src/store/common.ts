@@ -22,7 +22,7 @@ export const common_store = defineStore('de_common', {
         return darkTheme;
       }
     },
-    isDark:(state)=>{
+    isDark:(state):boolean=>{
       return state.theme==="dark";
     }
   },
