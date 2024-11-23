@@ -33,7 +33,7 @@ const copyJsonData=()=>{
   window.$message.success('JSON复制成功');
 }
 const copyMessage = (index:number)=>{
-  line_value.value?.messages.splice(index,0,line_value.value?.messages[index]);
+  line_value.value?.messages.splice(JSON.parse(JSON.stringify( index,0,line_value.value?.messages[index])));
 }
 const applyJsonStr = ()=>{
   if(line_value.value){

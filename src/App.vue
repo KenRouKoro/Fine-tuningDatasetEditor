@@ -72,7 +72,7 @@ const addLine = ()=>{
   });
 }
 const copyLine = (index)=>{
-  common.edit_message.value.push(common.edit_message.value[index]);
+  common.edit_message.value.push(JSON.parse(JSON.stringify( common.edit_message.value[index])));
 }
 const removeLine = (index)=>{
   common.edit_message.value.splice(index,1);
