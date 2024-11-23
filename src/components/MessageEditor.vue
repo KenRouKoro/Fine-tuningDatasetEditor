@@ -26,7 +26,17 @@ const options=[
     <template #header>
       <div style="display: flex;align-items: center;  column-gap: 8px;">
         <n-h4 style="margin: 0;">角色</n-h4>
+        <n-radio-group v-model:value="message_value.role" name="radiobuttongroup1">
+          <n-radio-button
+              v-for="song in options"
+              :key="song.value"
+              :value="song.value"
+              :label="song.label"
+          />
+        </n-radio-group>
+        <!--
         <n-select style="width: 150px;" v-model:value="message_value.role" :options="options"></n-select>
+        -->
       </div>
     </template>
     <template #header-extra>

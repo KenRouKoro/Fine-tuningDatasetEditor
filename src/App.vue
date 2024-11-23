@@ -16,8 +16,9 @@ const common = storeToRefs(commonStore);
 
 const editLine = ref<Line|null>(null);
 const split_value = ref<number>();
-const choiceIndex = ref<number>(0);
+const choiceIndex = ref<number>(-1);
 const showInput = ref(false);
+const showOutput = ref(false);
 const inputStr = ref("");
 
 
@@ -56,19 +57,22 @@ const downloadText = (fileName, text) =>{
   saveLink.download = fileName;
   saveLink.click();
 }
-const download = ()=>{
+const download = (filename:string)=>{
   let jsonLStr = "";
   for (let i = 0;i < common.edit_message.value.length;i++){
     jsonLStr = jsonLStr + JSON.stringify(common.edit_message.value[i],null,0);
     jsonLStr = jsonLStr + "\n";
   }
-  downloadText("out.jsonl",jsonLStr.trim('\n'));
+  downloadText(filename+".jsonl",jsonLStr.trim('\n'));
   window.$message.success('成功导出');
 }
 const addLine = ()=>{
   common.edit_message.value.push({
     messages:[]
   });
+}
+const copyLine = (index)=>{
+  common.edit_message.value.push(common.edit_message.value[index]);
 }
 const removeLine = (index)=>{
   common.edit_message.value.splice(index,1);
@@ -101,7 +105,7 @@ const removeAll = ()=>{
             </div>
             <div class = "header-item header-right">
               <n-button @click="showInput=true"> 导入 </n-button>
-              <n-button @click="download"> 导出 </n-button>
+              <n-button @click="showOutput=true"> 导出 </n-button>
               <n-popconfirm :show-icon="false" @positive-click="removeAll">
                 <template #trigger>
                   <n-button type="error"> 清空 </n-button>
@@ -122,17 +126,20 @@ const removeAll = ()=>{
                 </div>
                 <n-scrollbar class="content-left" style="height: calc(100vh - 4rem - 68px);">
                   <n-list hoverable bordered clickable>
-                    <n-list-item v-for="(line,index) in common.edit_message.value" @click="choiceLine(index)">
+                    <n-list-item v-for="(line,index) in common.edit_message.value" :class="{'choice-line':(choiceIndex === (index as number))}" @click="choiceLine(index)">
                       <n-h4 style="margin: 0;">
                         对话{{index + 1}}
                       </n-h4>
                       <template #suffix>
-                        <n-popconfirm :show-icon="false" @positive-click="removeLine(index)">
-                          <template #trigger>
-                            <n-button size="tiny" > ✕ </n-button>
-                          </template>
-                          确认删除"对话{{index+1}}"？
-                        </n-popconfirm>
+                        <n-flex :wrap="false">
+                          <n-button size="tiny" @click="copyLine(index)">复制</n-button>
+                          <n-popconfirm :show-icon="false" @positive-click="removeLine(index)">
+                            <template #trigger>
+                              <n-button size="tiny" > ✕ </n-button>
+                            </template>
+                            确认删除"对话{{index+1}}"？
+                          </n-popconfirm>
+                        </n-flex>
                       </template>
                     </n-list-item>
                   </n-list>
@@ -188,12 +195,25 @@ const removeAll = ()=>{
             </template>
           </n-card>
         </n-modal>
+        <n-modal v-model:show="showOutput">
+          <n-card title="导出" style="width: 400px;" size="huge" aria-modal="true" role="dialog" closable @close="showOutput=false">
+            <n-input v-model:value="common.filename.value" type="text" placeholder="文件名" />
+            <template #action>
+              <n-button @click="download(common.filename.value);showOutput=false" type="primary">
+                确认
+              </n-button>
+            </template>
+          </n-card>
+        </n-modal>
       </n-modal-provider>
     </n-message-provider>
   </n-config-provider>
 </template>
 
 <style scoped lang="scss">
+.choice-line{
+  background-color: #F08A00;
+}
 
 .header{
   background-color: var(--card-color);
