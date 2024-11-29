@@ -3,5 +3,9 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "types": ["pinia-plugin-persistedstate"],
+    "typeRoots": ["./node_modules/@types", "./src"]  // 确保包含声明文件的目录
+  }
 }

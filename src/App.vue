@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
-import {common_store} from "./store/common.ts";
+import {useCommonStore} from "./store/common.ts";
 import themeOverrides from "./overwrite.ts";
 import { ref} from "vue";
 import {Line} from "./types/message";
@@ -9,7 +9,7 @@ import LineEditor from "./components/LineEditor.vue";
 import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
 import GlobalMessage from "./components/GlobalMessage.vue";
 
-const commonStore = common_store();
+const commonStore = useCommonStore();
 
 const common = storeToRefs(commonStore);
 
@@ -40,10 +40,10 @@ const customRequest = ({
   reader.readAsText(file.file as Blob)
 }
 const inputByStr = (str:string)=>{
-  common.edit_message.value.length = 0;
+  common.editMessage.value.length = 0;
   const lines = str.split('\n');
   lines.forEach((line)=>{
-    common.edit_message.value.push({
+    common.editMessage.value.push({
       messages: JSON.parse(line).messages
     });
   })
@@ -59,31 +59,36 @@ const downloadText = (fileName, text) =>{
 }
 const download = (filename:string)=>{
   let jsonLStr = "";
-  for (let i = 0;i < common.edit_message.value.length;i++){
-    jsonLStr = jsonLStr + JSON.stringify(common.edit_message.value[i],null,0);
+  for (let i = 0;i < common.editMessage.value.length;i++){
+    jsonLStr = jsonLStr + JSON.stringify(common.editMessage.value[i],null,0);
     jsonLStr = jsonLStr + "\n";
   }
   downloadText(filename+".jsonl",jsonLStr.trim('\n'));
   window.$message.success('成功导出');
 }
 const addLine = ()=>{
-  common.edit_message.value.push({
-    messages:[]
+  common.editMessage.value.push({
+    messages:[],
+    info:'对话'+ (common.editMessage.value.length+1)
   });
 }
 const copyLine = (index)=>{
-  common.edit_message.value.push(JSON.parse(JSON.stringify( common.edit_message.value[index])));
+  common.editMessage.value.push(JSON.parse(JSON.stringify( common.editMessage.value[index])));
 }
 const removeLine = (index)=>{
-  common.edit_message.value.splice(index,1);
+  common.editMessage.value.splice(index,1);
 }
 const choiceLine = (index)=>{
   choiceIndex.value = index;
-  editLine.value = common.edit_message.value[index];
+  editLine.value = common.editMessage.value[index];
 }
 const removeAll = ()=>{
-  common.edit_message.value.length = 0;
+  common.editMessage.value.length = 0;
   editLine.value = null;
+}
+const clearClipboard = ()=>{
+  common.clipboard.value='';
+  window.$message.success('成功清空剪切板');
 }
 </script>
 
@@ -104,6 +109,12 @@ const removeAll = ()=>{
             <div class = "header-item header-center">
             </div>
             <div class = "header-item header-right">
+              <n-p style="margin: 0;">
+                剪切板状态：{{common.clipboard.value===''?'空':'有'}}
+              </n-p>
+              <n-button type="error" @click="clearClipboard">
+                清空剪切板
+              </n-button>
               <n-button @click="showInput=true"> 导入 </n-button>
               <n-button @click="showOutput=true"> 导出 </n-button>
               <n-popconfirm :show-icon="false" @positive-click="removeAll">
@@ -126,9 +137,9 @@ const removeAll = ()=>{
                 </div>
                 <n-scrollbar class="content-left" style="height: calc(100vh - 4rem - 68px);">
                   <n-list hoverable bordered clickable>
-                    <n-list-item v-for="(line,index) in common.edit_message.value" :class="{'choice-line':(choiceIndex === (index as number))}" @click="choiceLine(index)">
+                    <n-list-item v-for="(line,index) in common.editMessage.value" :class="{'choice-line':(choiceIndex === (index as number))}" @click="choiceLine(index)">
                       <n-h4 style="margin: 0;">
-                        对话{{index + 1}}
+                        {{ line.info ? line.info : `对话${index+1}` }}
                       </n-h4>
                       <template #suffix>
                         <n-flex :wrap="false">
@@ -137,7 +148,7 @@ const removeAll = ()=>{
                             <template #trigger>
                               <n-button size="tiny" > ✕ </n-button>
                             </template>
-                            确认删除"对话{{index+1}}"？
+                            确认删除"{{line.info ? line.info : `对话${index+1}`}}"？
                           </n-popconfirm>
                         </n-flex>
                       </template>
@@ -151,9 +162,8 @@ const removeAll = ()=>{
               <template #2>
                 <n-scrollbar class="content-right">
                   <LineEditor v-model="editLine">
-                    <n-h3 style="margin: 0;">
-                      对话{{choiceIndex+1}}
-                    </n-h3>
+                    <n-input v-if="editLine" v-model:value="editLine.info" :placeholder="`对话${choiceIndex+1}`">
+                    </n-input>
                   </LineEditor>
                 </n-scrollbar>
               </template>
@@ -212,7 +222,8 @@ const removeAll = ()=>{
 
 <style scoped lang="scss">
 .choice-line{
-  background-color: #F08A00;
+  background-color: var(--primary-color);
+  color: #fff !important;
 }
 
 .header{
