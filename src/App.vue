@@ -8,6 +8,7 @@ import {dateZhCN, UploadCustomRequestOptions, zhCN} from "naive-ui";
 import LineEditor from "./components/LineEditor.vue";
 import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
 import GlobalMessage from "./components/GlobalMessage.vue";
+import _ from 'lodash';
 
 const commonStore = useCommonStore();
 
@@ -43,10 +44,13 @@ const inputByStr = (str:string)=>{
   common.editMessage.value.length = 0;
   const lines = str.split('\n');
   lines.forEach((line)=>{
+    let obj = JSON.parse(line)
     common.editMessage.value.push({
-      messages: JSON.parse(line).messages
+      messages: obj.messages,
+      info: obj.info
     });
   })
+  choiceIndex.value = 0;
   showInput.value = false;
 }
 const downloadText = (fileName, text) =>{
@@ -61,6 +65,17 @@ const download = (filename:string)=>{
   let jsonLStr = "";
   for (let i = 0;i < common.editMessage.value.length;i++){
     jsonLStr = jsonLStr + JSON.stringify(common.editMessage.value[i],null,0);
+    jsonLStr = jsonLStr + "\n";
+  }
+  downloadText(filename+".jsonl",jsonLStr.trim('\n'));
+  window.$message.success('成功导出');
+}
+const downloadOpenai = (filename:string)=>{
+  let jsonLStr = "";
+  for (let i = 0;i < common.editMessage.value.length;i++){
+    let obj = _.cloneDeep(common.editMessage.value[i]);
+    delete obj.info;
+    jsonLStr = jsonLStr + JSON.stringify(obj,null,0);
     jsonLStr = jsonLStr + "\n";
   }
   downloadText(filename+".jsonl",jsonLStr.trim('\n'));
@@ -115,8 +130,8 @@ const clearClipboard = ()=>{
               <n-button type="error" @click="clearClipboard">
                 清空剪切板
               </n-button>
-              <n-button @click="showInput=true"> 导入 </n-button>
-              <n-button @click="showOutput=true"> 导出 </n-button>
+              <n-button type="info" @click="showInput=true"> 导入 </n-button>
+              <n-button type="info" @click="showOutput=true"> 导出 </n-button>
               <n-popconfirm :show-icon="false" @positive-click="removeAll">
                 <template #trigger>
                   <n-button type="error"> 清空 </n-button>
@@ -173,7 +188,7 @@ const clearClipboard = ()=>{
 
         </n-element>
         <n-modal v-model:show="showInput">
-          <n-card title="导入" style="width: 600px;" size="huge" aria-modal="true" role="dialog" closable @close="showInput=false">
+          <n-card title="导入" style="width: 600px;" size="small" aria-modal="true" role="dialog" closable @close="showInput=false">
             <n-input v-model:value="inputStr" placeholder="粘贴数据集文本到此" type="textarea" :autosize="{minRows:5,maxRows:10}">
             </n-input>
             <n-divider>
@@ -206,12 +221,20 @@ const clearClipboard = ()=>{
           </n-card>
         </n-modal>
         <n-modal v-model:show="showOutput">
-          <n-card title="导出" style="width: 400px;" size="huge" aria-modal="true" role="dialog" closable @close="showOutput=false">
+          <n-card title="导出" style="width: 400px;" size="small" aria-modal="true" role="dialog" closable @close="showOutput=false">
+            <n-p>
+              文件名
+            </n-p>
             <n-input v-model:value="common.filename.value" type="text" placeholder="文件名" />
             <template #action>
-              <n-button @click="download(common.filename.value);showOutput=false" type="primary">
-                确认
-              </n-button>
+              <n-flex>
+                <n-button @click="download(common.filename.value);showOutput=false" type="primary">
+                  导出项目
+                </n-button>
+                <n-button type="info" @click="downloadOpenai(common.filename.value);showOutput=false">
+                  导出训练用格式
+                </n-button>
+              </n-flex>
             </template>
           </n-card>
         </n-modal>

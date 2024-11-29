@@ -11,6 +11,9 @@ importers:
       axios:
         specifier: ^1.7.8
         version: 1.7.8
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       sass:
         specifier: ^1.81.0
         version: 1.81.0
