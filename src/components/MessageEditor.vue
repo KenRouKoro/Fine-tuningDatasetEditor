@@ -9,17 +9,21 @@ const messageValue: Ref<Message | null> = defineModel<Message | null>({ required
 // 定义角色选择的选项
 const options = [
   {
-    label: '系统',
-    value: 'system'
+    label: '用户',
+    value: 'human'
   },
   {
     label: '模型',
-    value: 'assistant'
+    value: 'gpt'
   },
   {
-    label: '用户',
-    value: 'user'
+    label: '函数调用',
+    value: 'function_call'
   },
+  {
+    label: '函数返回',
+    value: 'observation'
+  }
 ];
 </script>
 

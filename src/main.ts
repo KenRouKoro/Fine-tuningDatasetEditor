@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 import "./styles/fonts.scss"
-import "./styles/style.scss"
+import "./styles/style.css"
 import {createPinia} from "pinia";
 import piniaPluginPersistedstate  from 'pinia-plugin-persistedstate'
 

@@ -5,7 +5,7 @@ export type Message = {
     /**
      * 角色
      */
-    role: "system" | "assistant" | "user",
+    role: "gpt" | "human" | "function_call" | "observation",
     /**
      * 内容
      */
@@ -23,5 +23,7 @@ export type Line = {
     /**
      *  消息备注
      */
-    info: string
+    info: string,
+    tools: string,
+    system: string
 }

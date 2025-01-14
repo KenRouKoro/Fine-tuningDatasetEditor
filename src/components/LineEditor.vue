@@ -21,7 +21,7 @@ const jsonStr = ref("");
 // 添加一条新的系统消息到 messages 数组的末尾
 const addMessage = () => {
   lineValue.value?.messages.push({
-    role: "system",
+    role: "human",
     content: ""
   });
 };
@@ -29,7 +29,7 @@ const addMessage = () => {
 // 在指定索引位置插入一条新的系统消息
 const addMessageIn = (index: number) => {
   lineValue.value?.messages.splice(index, 0, {
-    role: "system",
+    role: "human",
     content: ""
   });
 };
@@ -148,7 +148,14 @@ const copyMessageJson = (index:number)=>{
 
         <!-- 非 JSON 编辑模式下的消息编辑器 -->
         <n-collapse-transition class="line-editor-content-editor" :show="!editJson">
-          <n-scrollbar style="padding-top: 0px; max-height: calc(100vh - 4rem - 64px);">
+          <n-scrollbar style="padding-top: 0px; max-height: calc(100vh - 4rem - 64px); width: 100%;" content-style="width:100%;">
+            <div class="message-button">
+              <n-card title="系统提示(可选)" class="" style="width:100%">
+                <n-input type="textarea" autosize v-model:value="lineValue.system">
+
+                </n-input>
+              </n-card>
+            </div>
             <!-- 遍历并渲染每一条消息 -->
             <div v-for="(message, index) in lineValue.messages" :key="index">
               <!-- 在第一条消息前添加“添加对话”按钮 -->
@@ -215,6 +222,13 @@ const copyMessageJson = (index:number)=>{
               <n-button type="info" style="width: 47.5%;" @click="pasteFromClipboard(-1)">
                 在此粘贴
               </n-button>
+            </div>
+            <div class="message-button">
+              <n-card title="工具调用说明(可选)" class="" style="width:100%">
+                <n-input type="textarea" autosize v-model:value="lineValue.tools">
+
+                </n-input>
+              </n-card>
             </div>
           </n-scrollbar>
         </n-collapse-transition>

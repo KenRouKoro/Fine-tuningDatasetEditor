@@ -47,7 +47,9 @@ const inputByStr = (str:string)=>{
     let obj = JSON.parse(line)
     common.editMessage.value.push({
       messages: obj.messages,
-      info: obj.info
+      info: obj.info,
+      tools: obj.tools,
+      system: obj.system
     });
   })
   choiceIndex.value = 0;
@@ -71,20 +73,24 @@ const download = (filename:string)=>{
   window.$message.success('成功导出');
 }
 const downloadOpenai = (filename:string)=>{
-  let jsonLStr = "";
+  //let jsonLStr = "";
+  let outArray = []
   for (let i = 0;i < common.editMessage.value.length;i++){
     let obj = _.cloneDeep(common.editMessage.value[i]);
     delete obj.info;
-    jsonLStr = jsonLStr + JSON.stringify(obj,null,0);
-    jsonLStr = jsonLStr + "\n";
+    //jsonLStr = jsonLStr + JSON.stringify(obj,null,0);
+    //jsonLStr = jsonLStr + "\n";
+    outArray.push(obj)
   }
-  downloadText(filename+".jsonl",jsonLStr.trim('\n'));
+  downloadText(filename+".json", JSON.stringify(outArray,null,0));//jsonLStr.trim('\n'));
   window.$message.success('成功导出');
 }
 const addLine = ()=>{
   common.editMessage.value.push({
     messages:[],
-    info:'对话'+ (common.editMessage.value.length+1)
+    info:'对话'+ (common.editMessage.value.length+1),
+    tools:'',
+    system:''
   });
 }
 const copyLine = (index)=>{
